@@ -10,33 +10,39 @@ if uploaded_file is not None:
     try:
         df = pd.read_excel(uploaded_file)
 
-        # Validation des données avec un bloc `else`
-        if "Temps" not in df.columns or "Vitesse" not in df.columns:
-            st.error("Le fichier Excel doit contenir des colonnes 'Temps' et 'Vitesse'.")
+        # Vérification que les colonnes nécessaires sont présentes
+        if "CODE PRODUIT" not in df.columns or "QTY LBS" not in df.columns or "HR" not in df.columns:
+            st.error("Le fichier Excel doit contenir les colonnes 'CODE PRODUIT', 'QTY LBS' et 'HR'.")
         else:
             # Affichage des données brutes
             st.write("Données du fichier Excel :")
             st.write(df)
 
+            # Calcul de la vitesse de production (QTY LBS / HR)
+            df["Vitesse de Production"] = df["QTY LBS"] / df["HR"]
+
             # Graphique en ligne de la vitesse de production
             st.write("Graphique de la Vitesse de Production en Ligne :")
             fig, ax = plt.subplots()
-            ax.plot(df["Temps"], df["Vitesse"])
-            ax.set_xlabel("Temps")
-            ax.set_ylabel("Vitesse de Production")
+            ax.plot(df["#ÉTAPE"], df["Vitesse de Production"])
+            ax.set_xlabel("Étape de Production")
+            ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
             st.pyplot(fig)
 
             # Graphique en barre de la vitesse de production
             st.write("Graphique en Barre de la Vitesse de Production :")
             fig, ax = plt.subplots()
-            ax.bar(df["Temps"], df["Vitesse"])
-            ax.set_xlabel("Temps")
-            ax.set_ylabel("Vitesse de Production")
+            ax.bar(df["#ÉTAPE"], df["Vitesse de Production"])
+            ax.set_xlabel("Étape de Production")
+            ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
             st.pyplot(fig)
 
-            # Calcul de la vitesse moyenne
-            vitesse_moyenne = df["Vitesse"].mean()
-            st.write(f"Vitesse de production moyenne : {vitesse_moyenne:.2f}")
+            # Affichage de la vitesse moyenne
+            vitesse_moyenne = df["Vitesse de Production"].mean()
+            st.write(f"Vitesse de production moyenne : {vitesse_moyenne:.2f} Lbs/Heure")
+
+    except Exception as e:
+        st.error(f"Une erreur s'est produite lors du traitement du fichier: {e}")
 
     except Exception as e:
         st.error(f"Une erreur s'est produite lors du traitement du fichier: {e}")
