@@ -14,35 +14,39 @@ if uploaded_file is not None:
         if "CODE PRODUIT" not in df.columns or "QTY LBS" not in df.columns or "HR" not in df.columns:
             st.error("Le fichier Excel doit contenir les colonnes 'CODE PRODUIT', 'QTY LBS' et 'HR'.")
         else:
-            # Affichage des données brutes
-            st.write("Données du fichier Excel :")
-            st.write(df)
+            # Conversion de la colonne "HR" en nombres à virgule flottante
+            df["HR"] = pd.to_numeric(df["HR"], errors='coerce')
 
-            # Calcul de la vitesse de production (QTY LBS / HR)
-            df["Vitesse de Production"] = df["QTY LBS"] / df["HR"]
+            # Vérification si la conversion a réussi
+            if df["HR"].isnull().any():
+                st.error("Impossible de convertir toutes les valeurs de la colonne 'HR' en nombres. Veuillez vérifier le format de vos données.")
+            else:
+                # Affichage des données brutes
+                st.write("Données du fichier Excel :")
+                st.write(df)
 
-            # Graphique en ligne de la vitesse de production
-            st.write("Graphique de la Vitesse de Production en Ligne :")
-            fig, ax = plt.subplots()
-            ax.plot(df["#ÉTAPE"], df["Vitesse de Production"])
-            ax.set_xlabel("Étape de Production")
-            ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
-            st.pyplot(fig)
+                # Calcul de la vitesse de production (QTY LBS / HR)
+                df["Vitesse de Production"] = df["QTY LBS"] / df["HR"]
 
-            # Graphique en barre de la vitesse de production
-            st.write("Graphique en Barre de la Vitesse de Production :")
-            fig, ax = plt.subplots()
-            ax.bar(df["#ÉTAPE"], df["Vitesse de Production"])
-            ax.set_xlabel("Étape de Production")
-            ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
-            st.pyplot(fig)
+                # Graphique en ligne de la vitesse de production
+                st.write("Graphique de la Vitesse de Production en Ligne :")
+                fig, ax = plt.subplots()
+                ax.plot(df["#ÉTAPE"], df["Vitesse de Production"])
+                ax.set_xlabel("Étape de Production")
+                ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
+                st.pyplot(fig)
 
-            # Affichage de la vitesse moyenne
-            vitesse_moyenne = df["Vitesse de Production"].mean()
-            st.write(f"Vitesse de production moyenne : {vitesse_moyenne:.2f} Lbs/Heure")
+                # Graphique en barre de la vitesse de production
+                st.write("Graphique en Barre de la Vitesse de Production :")
+                fig, ax = plt.subplots()
+                ax.bar(df["#ÉTAPE"], df["Vitesse de Production"])
+                ax.set_xlabel("Étape de Production")
+                ax.set_ylabel("Vitesse de Production (Lbs/Heure)")
+                st.pyplot(fig)
 
-    except Exception as e:
-        st.error(f"Une erreur s'est produite lors du traitement du fichier: {e}")
+                # Affichage de la vitesse moyenne
+                vitesse_moyenne = df["Vitesse de Production"].mean()
+                st.write(f"Vitesse de production moyenne : {vitesse_moyenne:.2f} Lbs/Heure")
 
     except Exception as e:
         st.error(f"Une erreur s'est produite lors du traitement du fichier: {e}")
